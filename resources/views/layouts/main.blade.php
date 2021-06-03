@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name') }}</title>
         
@@ -12,11 +13,11 @@
         <div class="relative bg-gray-200 dark:bg-theme-800">
             <div class="flex flex-col sm:flex-row sm:justify-around">
                 <div class="w-72 h-screen bg-gray-100 dark:bg-theme-900 fixed left-0">
-                    <nav class="mt-10 px-6">
-                        <h2 class="dark:text-white text-xl font-bold mb-12">
+                    <nav class="absolute w-72 px-6 flex flex-col bottom-0 h-full">
+                        <h2 class="my-10 px-6 dark:text-white text-xl font-bold">
                             {{ config('app.name') }}
                         </h2>
-                        <a class="flex items-center p-3 my-6 transition-colors duration-100 dark:text-white rounded-xl hover:text-white hover:bg-gradient-to-r hover:from-purple-400 hover:to-blue-400" href="#">
+                        <a class="flex items-center p-3 mb-6 transition-colors duration-100 dark:text-white rounded-xl hover:text-white hover:bg-gradient-to-r hover:from-purple-400 hover:to-blue-400" href="#">
                             <span class="text-center ml-2 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
@@ -29,6 +30,15 @@
                             
                             </span>
                         </a>
+                        <form class="mt-auto" method="POST" action="{{ route('logout') }}">
+                            @csrf
+
+                            <a class="flex items-center p-3 mb-6 transition-colors duration-100 dark:text-white rounded-xl text-white dark:bg-theme-700 bg-gray-300" href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();">
+                                <span class="mx-auto text-md tracking-wide leading-2 text-center">
+                                    Logout
+                                </span>
+                            </a>
+                        </form>
                     </nav>
                 </div>
                 <div class="ml-72 w-full text-white p-12">
@@ -42,7 +52,13 @@
                         <div class="px-2">Team</div>
                     </div>
                     <div class="text-theme-600 dark:text-white text-5xl my-10 font-extralight">
-                        5 Members
+                        {{ App\Models\User::count() }}
+                        
+                        @if(App\Models\User::count() > 1)
+                            Members
+                        @else
+                            Member
+                        @endif
                     </div>
                     <div>
                         <div>
@@ -82,125 +98,33 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-4 gap-4 my-10">
-                        <div class="bg-white dark:bg-theme-700 rounded-3xl p-8 text-center">
-                            <div class="bg-gray-200 dark:bg-theme-600 rounded-full w-32 h-32 m-auto mb-4 flex items-center justify-center">
-                                <h2 class="text-5xl tracking-widest font-thin">JC</h2>
-                            </div>
-                            <div class="dark:text-white text-gray-800 py-3">
-                                Jon Christie
-                            </div>
-                            <div class="text-gray-500">
-                                Organizer
-                            </div>
-                            <div class="flex items-center mt-6">
-                                <div class="w-20 text-gray-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                                    </svg>
+                        @foreach(App\Models\User::all() as $user)
+                            <div class="bg-white dark:bg-theme-700 rounded-3xl p-8 text-center">
+                                <div class="bg-gray-200 dark:bg-theme-600 rounded-full w-32 h-32 m-auto mb-4 flex items-center justify-center">
+                                    <h2 class="text-5xl tracking-widest font-thin">
+                                        {{ substr($user->first_name, 0, 1) . substr($user->last_name, 0, 1) }}
+                                    </h2>
                                 </div>
-                                <div class="w-full h-2 bg-gray-200 dark:bg-theme-600 rounded-full">
-                                    <div class="w-1/2 h-full text-center text-xs text-white bg-green-500 rounded-full">
+                                <div class="dark:text-white text-gray-800 py-3">
+                                    {{ $user->first_name . ' ' . $user->last_name }}
+                                </div>
+                                <div class="text-gray-500">
+                                    Organizer
+                                </div>
+                                <div class="flex items-center mt-6">
+                                    <div class="w-20 text-gray-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                                        </svg>
                                     </div>
-                                </div>
-                                <div class="w-20 text-right text-gray-500">50%</div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white dark:bg-theme-700 rounded-3xl p-8 text-center">
-                            <div class="bg-gray-200 dark:bg-theme-600 rounded-full w-32 h-32 m-auto mb-4 flex items-center justify-center">
-                                <h2 class="text-5xl tracking-widest font-thin">RR</h2>
-                            </div>
-                            <div class="dark:text-white text-gray-800 py-3">
-                                Russ Reed
-                            </div>
-                            <div class="text-gray-500">
-                                Co-Organizer
-                            </div>
-                            <div class="flex items-center mt-6">
-                                <div class="w-20 text-gray-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div class="w-full h-2 bg-gray-200 dark:bg-theme-600 rounded-full">
-                                    <div class="w-1/2 h-full text-center text-xs text-white bg-green-500 rounded-full">
+                                    <div class="w-full h-2 bg-gray-200 dark:bg-theme-600 rounded-full">
+                                        <div class="w-1/2 h-full text-center text-xs text-white bg-green-500 rounded-full">
+                                        </div>
                                     </div>
+                                    <div class="w-20 text-right text-gray-500">50%</div>
                                 </div>
-                                <div class="w-20 text-right text-gray-500">50%</div>
                             </div>
-                        </div>
-
-                        <div class="bg-white dark:bg-theme-700 rounded-3xl p-8 text-center">
-                            <div class="bg-gray-200 dark:bg-theme-600 rounded-full w-32 h-32 m-auto mb-4 flex items-center justify-center">
-                                <h2 class="text-5xl tracking-widest font-thin">BL</h2>
-                            </div>
-                            <div class="dark:text-white text-gray-800 py-3">
-                                Bryan Lenihan
-                            </div>
-                            <div class="text-gray-500">
-                                Co-Organizer
-                            </div>
-                            <div class="flex items-center mt-6">
-                                <div class="w-20 text-gray-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div class="w-full h-2 bg-gray-200 dark:bg-theme-600 rounded-full">
-                                    <div class="w-1/2 h-full text-center text-xs text-white bg-green-500 rounded-full">
-                                    </div>
-                                </div>
-                                <div class="w-20 text-right text-gray-500">50%</div>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-white dark:bg-theme-700 rounded-3xl p-8 text-center">
-                            <div class="bg-gray-200 dark:bg-theme-600 rounded-full w-32 h-32 m-auto mb-4 flex items-center justify-center">
-                                <h2 class="text-5xl tracking-widest font-thin">DB</h2>
-                            </div>
-                            <div class="dark:text-white text-gray-800 py-3">
-                                Derek Bourgeois
-                            </div>
-                            <div class="text-gray-500">
-                                Co-Organizer
-                            </div>
-                            <div class="flex items-center mt-6">
-                                <div class="w-20 text-gray-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div class="w-full h-2 bg-gray-200 dark:bg-theme-600 rounded-full">
-                                    <div class="w-1/2 h-full text-center text-xs text-white bg-green-500 rounded-full">
-                                    </div>
-                                </div>
-                                <div class="w-20 text-right text-gray-500">50%</div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white dark:bg-theme-700 rounded-3xl p-8 text-center">
-                            <div class="bg-gray-200 dark:bg-theme-600 rounded-full w-32 h-32 m-auto mb-4 flex items-center justify-center">
-                                <h2 class="text-5xl tracking-widest font-thin">DM</h2>
-                            </div>
-                            <div class="dark:text-white text-gray-800 py-3">
-                                Daniel Mason
-                            </div>
-                            <div class="text-gray-500">
-                                Member
-                            </div>
-                            <div class="flex items-center mt-6">
-                                <div class="w-20 text-gray-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div class="w-full h-2 bg-gray-200 dark:bg-theme-600 rounded-full">
-                                    <div class="w-1/2 h-full text-center text-xs text-white bg-green-500 rounded-full">
-                                    </div>
-                                </div>
-                                <div class="w-20 text-right text-gray-500">50%</div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>

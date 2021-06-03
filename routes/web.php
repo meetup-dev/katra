@@ -13,6 +13,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Route::get('/', function () {
+//     return view('layouts.main');
+// });
+
 Route::get('/', function () {
+    // \Auth::logout();
     return view('layouts.main');
-});
+// })->name('dashboard');
+})->middleware(['auth'])->name('dashboard');
+
+require __DIR__.'/auth.php';
